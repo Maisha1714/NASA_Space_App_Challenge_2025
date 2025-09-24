@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExoQuest AI - Discover New Worlds</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d1b69 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.8)); }
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            color: #00d4ff;
+            font-size: 1.5em;
+        }
+
+        .transit-detector {
+            position: relative;
+        }
+
+        .light-curve {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            height: 300px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .ai-analysis {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ffff44, #44ff44);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .discovery-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .discovery-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00d4ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .discovery-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .planet-viz {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .orbit {
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .star-center {
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ffff00 0%, #ff8800 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.6);
+        }
+
+        .planet {
+            width: 10px;
+            height: 10px;
+            background: #00d4ff;
+            border-radius: 50%;
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .citizen-score {
+            background: linear-gradient(45deg, #ff00ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .gamification {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .achievement {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .achievement-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            transform: translateX(400px);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="notification" id="notification">
+        🌟 New exoplanet candidate detected!
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">ExoQuest AI</div>
+            <div class="tagline">"Where AI meets the cosmos - Discovering humanity's galactic neighbors"</div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="planetsFound">5,247</div>
+                    <div>Planets Discovered</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="citizenScientists">127,891</div>
+                    <div>Citizen Scientists</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="validationsToday">1,847</div>
+                    <div>Validations Today</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="panel transit-detector">
+                <h2>🔭 AI Transit Detector</h2>
+                <p>Our AI analyzes stellar light curves in real-time, detecting the tiny dips in brightness caused by planets crossing in front of their host stars.</p>
+                
+                <div class="light-curve">
+                    <canvas id="lightCurveChart" width="100%" height="250"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="generateNewLightCurve()">🎲 Generate New Star</button>
+                    <button class="btn btn-secondary" onclick="runAIAnalysis()">🤖 Run AI Analysis</button>
+                    <button class="btn btn-secondary" onclick="simulateTransit()">⭐ Simulate Transit</button>
+                </div>
+
+                <div class="ai-analysis" id="aiAnalysis" style="display: none;">
+                    <h3>🧠 AI Analysis Results</h3>
+                    <p id="analysisText">Analyzing stellar data...</p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceBar" style="width: 0%"></div>
+                    </div>
+                    <p id="confidenceText">Confidence: 0%</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🌍 Citizen Science Hub</h2>
+                <p>Join thousands of volunteers worldwide in validating AI-detected exoplanet candidates!</p>
+                
+                <div class="planet-viz">
+                    <div class="orbit">
+                        <div class="star-center"></div>
+                        <div class="planet"></div>
+                    </div>
+                    <p>Kepler-442b - Your latest discovery!</p>
+                </div>
+
+                <div class="gamification">
+                    <div class="achievement">
+                        <div class="achievement-icon">🏆</div>
+                        <div>Level 7</div>
+                        <div>Explorer</div>
+                    </div>
+                    <div class="achievement">
+                        <div class="citizen-score" id="citizenScore">2,431</div>
+                        <div>Discovery Points</div>
+                    </div>
+                    <div class="achievement">
+                        <div class="achievement-icon">🎖️</div>
+                        <div>42</div>
+                        <div>Verified Planets</div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="validatePlanet()">✅ Validate This Planet</button>
+                    <button class="btn btn-secondary" onclick="skipCandidate()">⏭️ Skip Candidate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🚀 Live Discovery Feed</h2>
+            <div class="discovery-feed" id="discoveryFeed">
+                <div class="discovery-item">
+                    <strong>TOI-2109b</strong> - Super-hot Jupiter detected by @AstroSarah_UK | Confidence: 97.3% | <em>2 minutes ago</em>
+                </div>
+                <div class="discovery-item">
+                    <strong>K2-411b</strong> - Earth-sized planet in habitable zone | Validated by @CosmicHunter | <em>7 minutes ago</em>
+                </div>
+                <div class="discovery-item">
+                    <strong>TESS-2847c</strong> - Potential super-Earth | AI flagged for human review | <em>12 minutes ago</em>
+                </div>
+                <div class="discovery-item">
+                    <strong>Kepler-1649d</strong> - Rocky planet 1.2x Earth size | Discovered by student team | <em>18 minutes ago</em>
+                </div>
+                <div class="discovery-item pulse">
+                    <strong>🔥 HOT: TRAPPIST-1h</strong> - Seventh planet in system confirmed! | Historic discovery | <em>23 minutes ago</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize stars background
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 100;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Light curve chart
+        let lightCurveChart;
+        let currentData = [];
+
+        function initChart() {
+            const ctx = document.getElementById('lightCurveChart').getContext('2d');
+            lightCurveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Stellar Brightness',
+                        data: [],
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (hours)',
+                                color: 'white'
+                            },
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Relative Brightness',
+                                color: 'white'
+                            },
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateNewLightCurve() {
+            const data = [];
+            const labels = [];
+            const hasTransit = Math.random() > 0.4; // 60% chance of transit
+            
+            for (let i = 0; i < 100; i++) {
+                const time = i * 0.1;
+                let brightness = 1.0 + (Math.random() - 0.5) * 0.02; // Stellar noise
+                
+                // Add transit dip if planet exists
+                if (hasTransit && time > 4 && time < 6) {
+                    const transitDepth = 0.98 - Math.random() * 0.05; // 1-5% dip
+                    const transitShape = Math.cos((time - 5) * Math.PI) * 0.5 + 0.5;
+                    brightness *= (transitDepth + (1 - transitDepth) * (1 - transitShape));
+                }
+                
+                data.push(brightness);
+                labels.push(time.toFixed(1));
+            }
+            
+            currentData = { data, hasTransit };
+            
+            lightCurveChart.data.labels = labels;
+            lightCurveChart.data.datasets[0].data = data;
+            lightCurveChart.update();
+            
+            // Hide previous analysis
+            document.getElementById('aiAnalysis').style.display = 'none';
+        }
+
+        function runAIAnalysis() {
+            const analysisDiv = document.getElementById('aiAnalysis');
+            const analysisText = document.getElementById('analysisText');
+            const confidenceBar = document.getElementById('confidenceBar');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            analysisDiv.style.display = 'block';
+            analysisText.textContent = 'Analyzing stellar data...';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                const confidence = currentData.hasTransit ? 
+                    85 + Math.random() * 12 : // High confidence for real transits
+                    15 + Math.random() * 30;  // Low confidence for noise
+                
+                const roundedConfidence = Math.round(confidence);
+                
+                if (roundedConfidence > 80) {
+                    analysisText.innerHTML = `
+                        <strong>🎉 EXOPLANET DETECTED!</strong><br>
+                        Transit signature detected with high confidence.<br>
+                        Estimated planet size: ${(0.8 + Math.random() * 2).toFixed(1)} Earth radii<br>
+                        Orbital period: ${(2 + Math.random() * 10).toFixed(1)} days
+                    `;
+                    showNotification();
+                    updateCounters();
+                } else if (roundedConfidence > 50) {
+                    analysisText.innerHTML = `
+                        <strong>⚠️ CANDIDATE DETECTED</strong><br>
+                        Possible transit detected. Human validation needed.<br>
+                        Could be planetary transit or stellar variability.
+                    `;
+                } else {
+                    analysisText.innerHTML = `
+                        <strong>❌ NO TRANSIT DETECTED</strong><br>
+                        No significant planetary transit signature found.<br>
+                        Data shows normal stellar variability.
+                    `;
+                }
+                
+                confidenceBar.style.width = roundedConfidence + '%';
+                confidenceText.textContent = `Confidence: ${roundedConfidence}%`;
+            }, 2000);
+        }
+
+        function simulateTransit() {
+            // Generate a guaranteed transit
+            const data = [];
+            const labels = [];
+            
+            for (let i = 0; i < 100; i++) {
+                const time = i * 0.1;
+                let brightness = 1.0 + (Math.random() - 0.5) * 0.01; // Less noise
+                
+                // Clear transit signature
+                if (time > 4 && time < 6) {
+                    const transitDepth = 0.96; // 4% dip
+                    const transitShape = Math.cos((time - 5) * Math.PI) * 0.5 + 0.5;
+                    brightness *= (transitDepth + (1 - transitDepth) * (1 - transitShape));
+                }
+                
+                data.push(brightness);
+                labels.push(time.toFixed(1));
+            }
+            
+            currentData = { data, hasTransit: true };
+            
+            lightCurveChart.data.labels = labels;
+            lightCurveChart.data.datasets[0].data = data;
+            lightCurveChart.update();
+            
+            document.getElementById('aiAnalysis').style.display = 'none';
+        }
+
+        function validatePlanet() {
+            const score = document.getElementById('citizenScore');
+            const currentScore = parseInt(score.textContent.replace(',', ''));
+            score.textContent = (currentScore + 100).toLocaleString();
+            
+            addDiscoveryFeedItem("New validation by you! +100 points earned.");
+            showNotification("Great work! Planet validated successfully.");
+        }
+
+        function skipCandidate() {
+            addDiscoveryFeedItem("Candidate skipped - flagged for expert review.");
+        }
+
+        function showNotification(message = "🌟 New exoplanet candidate detected!") {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function updateCounters() {
+            const planetsFound = document.getElementById('planetsFound');
+            const validations = document.getElementById('validationsToday');
+            
+            planetsFound.textContent = (parseInt(planetsFound.textContent.replace(',', '')) + 1).toLocaleString();
+            validations.textContent = (parseInt(validations.textContent.replace(',', '')) + 1).toLocaleString();
+        }
+
+        function addDiscoveryFeedItem(text) {
+            const feed = document.getElementById('discoveryFeed');
+            const newItem = document.createElement('div');
+            newItem.className = 'discovery-item pulse';
+            newItem.innerHTML = `<strong>YOU:</strong> ${text} | <em>Just now</em>`;
+            feed.insertBefore(newItem, feed.firstChild);
+            
+            // Remove pulse after animation
+            setTimeout(() => {
+                newItem.classList.remove('pulse');
+            }, 2000);
+        }
+
+        // Auto-update discovery feed
+        function updateDiscoveryFeed() {
+            const discoveries = [
+                "TOI-3456b - Mini-Neptune discovered by AI | Confidence: 94.2%",
+                "K2-789c - Potentially habitable world found | Awaiting validation",
+                "TESS-1122d - Super-Earth in 3-planet system | Student discovery!",
+                "Kepler-9876f - Hot Jupiter with unusual orbit | Expert confirmed",
+                "TOI-4567g - Earth-like planet candidate | Citizen flagged"
+            ];
+            
+            if (Math.random() > 0.7) {
+                const randomDiscovery = discoveries[Math.floor(Math.random() * discoveries.length)];
+                addDiscoveryFeedItem(randomDiscovery);
+            }
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            initChart();
+            generateNewLightCurve();
+            
+            // Auto-update counters and feed
+            setInterval(() => {
+                const scientists = document.getElementById('citizenScientists');
+                scientists.textContent = (parseInt(scientists.textContent.replace(',', '')) + Math.floor(Math.random() * 3)).toLocaleString();
+                
+                updateDiscoveryFeed();
+            }, 5000);
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification("Welcome to ExoQuest AI! Start discovering new worlds.");
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
